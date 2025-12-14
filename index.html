@@ -751,7 +751,7 @@
 <div class="save-indicator" id="saveIndicator">已自動儲存</div>
 <script>
 (function () {
-  const STORAGE_KEY = "nijiTrip2026_v12";
+  const STORAGE_KEY = "nijiTrip2026_v13";
   const UNDO_LIMIT = 20;
 
   let undoStack = [];
@@ -1192,6 +1192,30 @@
 
   /* -------------- Day 編號與日期：自動重算 -------------- */
 
+  function parseDateString(str) {
+    if (!str) return null;
+    const m = String(str).match(/(\d+)\s*\/\s*(\d+)/);
+    if (!m) return null;
+    const month = parseInt(m[1], 10);
+    const day = parseInt(m[2], 10);
+    if (isNaN(month) || isNaN(day)) return null;
+    const year = new Date().getFullYear();
+    return new Date(year, month - 1, day);
+  }
+
+  function formatDate(d) {
+    const m = d.getMonth() + 1;
+    const day = d.getDate();
+    return `${m}/${day}`;
+  }
+
+  function getNextDateString(lastStr) {
+    const d = parseDateString(lastStr);
+    if (!d) return lastStr || "";
+    d.setDate(d.getDate() + 1);
+    return formatDate(d);
+  }
+
   function renumberDays() {
     const navRow = document.querySelector(".day-nav-row");
     const content = document.getElementById("content");
@@ -1199,7 +1223,6 @@
 
     const chips = navRow.querySelectorAll(".day-chip");
     const sections = content.querySelectorAll("section[id^='day-']");
-    // 如果數量不同也先照 chips 順序處理能處理到的
     const len = Math.min(chips.length, sections.length);
 
     for (let i = 0; i < len; i++) {
@@ -1209,9 +1232,13 @@
 
       const mainSpan = chip.querySelector(".day-chip-main");
       const subSpan = chip.querySelector(".day-chip-sub");
-      const dateText = (subSpan?.textContent || "").trim();
 
-      // 將主文字中的「數字」替換成正確的 dayNum，保留前後字
+      const dateText =
+        (subSpan?.textContent || "").trim() ||
+        section.getAttribute("data-date") ||
+        "";
+
+      // Day 標籤上的文字：只更新數字，其餘保留
       if (mainSpan) {
         const txt = mainSpan.textContent || "";
         const m = txt.match(/^(.*?)(\d+)(.*)$/);
@@ -1235,6 +1262,10 @@
             : `Day ${dayNum}`;
         }
       }
+
+      if (subSpan && dateText) {
+        subSpan.textContent = dateText;
+      }
     }
   }
 
@@ -1246,25 +1277,36 @@
     if (!content || !navRow) return;
 
     const sections = content.querySelectorAll("section[id^='day-']");
-    if (sections.length === 0) return;
+    const chips = navRow.querySelectorAll(".day-chip");
+    if (sections.length === 0 || chips.length === 0) return;
 
     const lastSection = sections[sections.length - 1];
-    const firstChip = navRow.querySelector(".day-chip");
-    if (!firstChip) return;
+    const lastChip = chips[chips.length - 1];
 
+    const lastDateAttr = lastSection.getAttribute("data-date") || "";
+    const lastSubSpan = lastChip.querySelector(".day-chip-sub");
+    const lastDateText = (lastSubSpan?.textContent || "").trim() || lastDateAttr;
+    const nextDate = getNextDateString(lastDateText);
+
+    // 複製最後一個 section 做新的一天
     const newSection = lastSection.cloneNode(true);
     content.appendChild(newSection);
-
-    const lastDate = lastSection.getAttribute("data-date") || "";
 
     // 清空新 day 裡面的照片
     newSection.querySelectorAll("img.spot-photo").forEach(img => img.remove());
     newSection.querySelectorAll(".image-list").forEach(list => (list.innerHTML = ""));
 
-    // 新增一個 day chip（複製第一個，再讓 renumberDays 統一編號）
-    const newChip = firstChip.cloneNode(true);
-    const subSpan = newChip.querySelector(".day-chip-sub");
-    if (subSpan) subSpan.textContent = lastDate;
+    // 更新新 day 的日期屬性（編號之後交給 renumberDays）
+    if (nextDate) {
+      newSection.setAttribute("data-date", nextDate);
+      const t = newSection.querySelector(".day-title");
+      if (t) t.textContent = `Day ? （${nextDate}）`;
+    }
+
+    // 複製一個 chip
+    const newChip = lastChip.cloneNode(true);
+    const newSub = newChip.querySelector(".day-chip-sub");
+    if (newSub && nextDate) newSub.textContent = nextDate;
     navRow.appendChild(newChip);
 
     enhanceAllCards();
@@ -1320,7 +1362,7 @@
 
     let draggingChip = null;
 
-    // 確保每個 chip 都可拖拉
+    // 先讓所有 chip 都是 draggable
     navRow.querySelectorAll(".day-chip").forEach(chip => {
       chip.setAttribute("draggable", "true");
     });
@@ -1331,13 +1373,8 @@
       draggingChip = chip;
       chip.classList.add("dragging");
       e.dataTransfer.effectAllowed = "move";
-    });
-
-    navRow.addEventListener("dragend", () => {
-      if (draggingChip) draggingChip.classList.remove("dragging");
-      draggingChip = null;
-      renumberDays();
-      saveState();
+      // 某些瀏覽器需要 setData 才會啟用拖拉
+      e.dataTransfer.setData("text/plain", "day-chip");
     });
 
     navRow.addEventListener("dragover", e => {
@@ -1351,24 +1388,38 @@
 
       if (before) navRow.insertBefore(draggingChip, target);
       else navRow.insertBefore(draggingChip, target.nextSibling);
-
-      // 對應的 Day 區塊一起移動
-      const chips = Array.from(navRow.querySelectorAll(".day-chip"));
-      const sections = Array.from(content.querySelectorAll("section[id^='day-']"));
-      if (chips.length === sections.length) {
-        const fromIndex = chips.indexOf(draggingChip);
-        const toIndex = chips.indexOf(target);
-        if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-          const movingSec = sections[fromIndex];
-          const targetSec = sections[toIndex];
-          const parent = movingSec.parentElement;
-          if (before) parent.insertBefore(movingSec, targetSec);
-          else parent.insertBefore(movingSec, targetSec.nextSibling);
-        }
-      }
     });
 
-    // 編輯 Day 標籤或日期時，重新同步標題＋存檔
+    navRow.addEventListener("dragend", () => {
+      if (draggingChip) draggingChip.classList.remove("dragging");
+      draggingChip = null;
+
+      // 根據 chip 的最終順序，重排底下的 section
+      const chips = Array.from(navRow.querySelectorAll(".day-chip"));
+      const sections = Array.from(content.querySelectorAll("section[id^='day-']"));
+
+      if (chips.length === sections.length) {
+        const parent = sections[0].parentElement;
+        const byId = {};
+        sections.forEach(sec => {
+          const m = sec.id.match(/day-(\d+)/);
+          if (m) byId[m[1]] = sec;
+        });
+
+        chips.forEach(chip => {
+          const href = chip.getAttribute("href") || "";
+          const m = href.match(/day-(\d+)/);
+          if (!m) return;
+          const sec = byId[m[1]];
+          if (sec) parent.appendChild(sec);
+        });
+      }
+
+      renumberDays();
+      saveState();
+    });
+
+    // 編輯 Day 標題或日期時，重新同步 Day 區塊標題
     navRow.addEventListener("input", e => {
       if (e.target.matches(".day-chip-main, .day-chip-sub")) {
         renumberDays();
@@ -1401,6 +1452,6 @@ if ("serviceWorker" in navigator) {
     console.log("Service Worker 註冊失敗");
   });
 }
-      </script>
+</script>
 </body>
   </html>
