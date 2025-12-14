@@ -330,6 +330,25 @@
     .spot-photo:hover {
       opacity: 0.85;
     }
+    /* 每個景點卡片裡的備註欄位 */
+    .spot-note {
+      margin-top: 6px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      background: #fff7ec;
+      border: 1px dashed var(--border-soft);
+      font-size: 11px;
+      color: var(--brown-soft);
+    }
+    .spot-note-title {
+      font-weight: 600;
+      margin-bottom: 2px;
+      font-size: 11px;
+      color: var(--brown-main);
+    }
+    .spot-note-body {
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -1012,6 +1031,7 @@
       let row = card.querySelector(".btn-row");
       if (!row) return;
 
+      // 1. 新增「📷 新增圖片」按鈕（如果尚未存在）
       if (!row.querySelector(".btn-photo")) {
         const photoBtn = document.createElement("button");
         photoBtn.type = "button";
@@ -1027,6 +1047,7 @@
         }
       }
 
+      // 2. 新增圖片列表容器（如果尚未存在）
       if (!card.querySelector(".image-list")) {
         const imgList = document.createElement("div");
         imgList.className = "image-list";
@@ -1034,10 +1055,22 @@
         card.appendChild(imgList);
       }
 
+      // 3. 新增「備註欄」區塊（如果尚未存在）
+      if (!card.querySelector(".spot-note")) {
+        const note = document.createElement("div");
+        note.className = "spot-note editable-block";
+        note.setAttribute("contenteditable", "true");
+        note.innerHTML = `
+          <div class="spot-note-title">備註</div>
+          <div class="spot-note-body">可在這裡寫這個景點的小提醒、餐點、排隊時間等等…</div>
+        `;
+        card.appendChild(note);
+      }
+
+      // 4. 讓整張卡片可拖拉排序
       card.setAttribute("draggable", "true");
     });
   }
-
   function attachDragAndDrop() {
     const content = document.getElementById("content");
     if (!content) return;
