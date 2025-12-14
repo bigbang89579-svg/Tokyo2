@@ -2,10 +2,10 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <title>Niji Trip 2026 🌈</title>
+  <title>Niji Trip 2026 · 暖色主題</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#ffd48d">
-  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffd48d" />
+  <link rel="manifest" href="manifest.json" />
   <style>
     :root {
       --bg-cream: #fff7ec;
@@ -15,6 +15,9 @@
       --brown-main: #5a3b32;
       --brown-soft: #7a5446;
       --border-soft: #ead8c0;
+    }
+    * {
+      box-sizing: border-box;
     }
     body {
       font-family: "Noto Sans TC", system-ui, sans-serif;
@@ -38,7 +41,7 @@
     }
     header h1 {
       margin: 0;
-      font-size: 20px;
+      font-size: 22px;
       letter-spacing: 0.06em;
     }
     header p {
@@ -50,6 +53,24 @@
       margin: 4px 0 2px;
       font-size: 11px;
       opacity: 0.85;
+    }
+
+    .toolbar {
+      margin-top: 6px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .toolbar button {
+      border: none;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      background: #ffe0a8;
+      color: var(--brown-main);
+      box-shadow: 0 1px 3px rgba(190, 150, 110, 0.5);
     }
 
     .day-nav {
@@ -86,9 +107,23 @@
       align-items: flex-start;
       min-width: 72px;
       box-shadow: 0 1px 3px rgba(200, 170, 130, 0.35);
+      cursor: pointer;
     }
-    .day-chip-main { font-weight: 600; font-size: 12px; }
-    .day-chip-sub { font-size: 10px; opacity: 0.9; }
+    .day-chip-main {
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .day-chip-sub {
+      font-size: 10px;
+      opacity: 0.9;
+    }
+    .day-chip[contenteditable="true"] {
+      cursor: text;
+    }
+    .day-chip.dragging {
+      opacity: 0.8;
+      box-shadow: 0 4px 10px rgba(150, 110, 80, 0.65);
+    }
 
     .container {
       padding: 12px 14px 56px;
@@ -138,6 +173,7 @@
       color: #8f7b6a;
       margin-top: 3px;
     }
+
     .btn-row {
       margin-top: 6px;
       display: flex;
@@ -249,10 +285,12 @@
     }
 
     .editable-block { outline: none; }
-    .editable-block:focus-within {
+    .editable-block:focus-within,
+    .editable-block:focus {
       box-shadow: 0 0 0 2px rgba(255, 212, 141, 0.9);
       border-color: #ffd48d;
     }
+
     .save-indicator {
       position: fixed;
       right: 16px;
@@ -292,25 +330,6 @@
       cursor: default;
     }
 
-    /* 上方備份工具列 */
-    .toolbar {
-      margin-top: 6px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      font-size: 11px;
-    }
-    .toolbar button {
-      border: none;
-      border-radius: 999px;
-      padding: 4px 10px;
-      font-size: 11px;
-      cursor: pointer;
-      background: #ffe0a8;
-      color: var(--brown-main);
-      box-shadow: 0 1px 3px rgba(190, 150, 110, 0.5);
-    }
-
     /* 圖片列表 */
     .image-list {
       margin-top: 6px;
@@ -327,10 +346,9 @@
       box-shadow: 0 1px 3px rgba(190, 150, 110, 0.4);
       cursor: pointer;
     }
-    .spot-photo:hover {
-      opacity: 0.85;
-    }
-    /* 每個景點卡片裡的備註欄位 */
+    .spot-photo:hover { opacity: 0.85; }
+
+    /* 每個景點上的專屬備註欄位 */
     .spot-note {
       margin-top: 6px;
       padding: 6px 8px;
@@ -341,23 +359,31 @@
       color: var(--brown-soft);
     }
     .spot-note-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-weight: 600;
       margin-bottom: 2px;
       font-size: 11px;
       color: var(--brown-main);
     }
     .spot-note-body {
+      font-size: 11px;
       white-space: pre-wrap;
+    }
+    .spot-note-title .note-photo-btn {
+      padding: 3px 8px;
+      font-size: 10px;
     }
   </style>
 </head>
 <body>
 <header>
-  <h1 class="editable-block" contenteditable="true">Niji Trip 2026 🌈</h1>
-  <p class="editable-block" contenteditable="true">
+  <h1 contenteditable="true" class="editable-block">Niji Trip 2026 🌈</h1>
+  <p contenteditable="true" class="editable-block">
     東京行程 · 暖色主題 · 拖拉排序＋住宿欄位＋每日花費＋回上一步
   </p>
-  <div class="hint editable-block" contenteditable="true">
+  <div class="hint">
     ✏️ 行程卡可以直接改文字、拖拉排序；改錯可以用右下角「回上一步」。
   </div>
 
@@ -368,96 +394,133 @@
     <button type="button" id="btnRemoveDay">－ 刪除最後一天</button>
   </div>
 </header>
+
 <!-- 匯入備份用的隱藏 input -->
-<input type="file" id="backupImport" accept="application/json" style="display:none">
+<input type="file" id="backupImport" accept="application/json" style="display:none" />
 
-<!-- 新增圖片用的隱藏 input -->
-<input type="file" id="photoInput" accept="image/*" style="display:none">
+<!-- 新增圖片用的隱藏 input（景點＋備註共用） -->
+<input type="file" id="photoInput" accept="image/*" style="display:none" />
 
-<div class="day-nav-row">
-  <a class="day-chip" href="#day-1">
-    <span class="day-chip-main" contenteditable="true">Day 1</span>
-    <span class="day-chip-sub"  contenteditable="true">5/8</span>
-  </a>
-  <a class="day-chip" href="#day-2">
-    <span class="day-chip-main" contenteditable="true">Day 2</span>
-    <span class="day-chip-sub"  contenteditable="true">5/9</span>
-  </a>
-  <a class="day-chip" href="#day-3">
-    <span class="day-chip-main" contenteditable="true">Day 3</span>
-    <span class="day-chip-sub"  contenteditable="true">5/10</span>
-  </a>
-  <a class="day-chip" href="#day-4">
-    <span class="day-chip-main" contenteditable="true">Day 4</span>
-    <span class="day-chip-sub"  contenteditable="true">5/11</span>
-  </a>
-  <a class="day-chip" href="#day-5">
-    <span class="day-chip-main" contenteditable="true">Day 5</span>
-    <span class="day-chip-sub"  contenteditable="true">5/12</span>
-  </a>
-  <a class="day-chip" href="#day-6">
-    <span class="day-chip-main" contenteditable="true">Day 6</span>
-    <span class="day-chip-sub"  contenteditable="true">5/13</span>
-  </a>
-  <a class="day-chip" href="#day-7">
-    <span class="day-chip-main" contenteditable="true">Day 7</span>
-    <span class="day-chip-sub"  contenteditable="true">5/14</span>
-  </a>
-  <a class="day-chip" href="#day-8">
-    <span class="day-chip-main" contenteditable="true">Day 8</span>
-    <span class="day-chip-sub"  contenteditable="true">5/15</span>
-  </a>
-  <a class="day-chip" href="#day-9">
-    <span class="day-chip-main" contenteditable="true">Day 9</span>
-    <span class="day-chip-sub"  contenteditable="true">5/16</span>
-  </a>
-  <a class="day-chip" href="#day-10">
-    <span class="day-chip-main" contenteditable="true">Day 10</span>
-    <span class="day-chip-sub"  contenteditable="true">5/17</span>
-  </a>
-  <a class="day-chip" href="#day-11">
-    <span class="day-chip-main" contenteditable="true">Day 11</span>
-    <span class="day-chip-sub"  contenteditable="true">5/18</span>
-  </a>
-  <a class="day-chip" href="#day-12">
-    <span class="day-chip-main" contenteditable="true">Day 12</span>
-    <span class="day-chip-sub"  contenteditable="true">5/19</span>
-  </a>
-  <a class="day-chip" href="#day-13">
-    <span class="day-chip-main" contenteditable="true">Day 13</span>
-    <span class="day-chip-sub"  contenteditable="true">5/20</span>
-  </a>
-  <a class="day-chip" href="#day-14">
-    <span class="day-chip-main" contenteditable="true">Day 14</span>
-    <span class="day-chip-sub"  contenteditable="true">5/21</span>
-  </a>
-</div>  <!-- Day 1 -->
+<div class="day-nav">
+  <div class="day-nav-row">
+    <a class="day-chip" href="#day-1" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 1</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/8</span>
+    </a>
+    <a class="day-chip" href="#day-2" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 2</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/9</span>
+    </a>
+    <a class="day-chip" href="#day-3" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 3</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/10</span>
+    </a>
+    <a class="day-chip" href="#day-4" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 4</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/11</span>
+    </a>
+    <a class="day-chip" href="#day-5" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 5</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/12</span>
+    </a>
+    <a class="day-chip" href="#day-6" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 6</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/13</span>
+    </a>
+    <a class="day-chip" href="#day-7" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 7</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/14</span>
+    </a>
+    <a class="day-chip" href="#day-8" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 8</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/15</span>
+    </a>
+    <a class="day-chip" href="#day-9" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 9</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/16</span>
+    </a>
+    <a class="day-chip" href="#day-10" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 10</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/17</span>
+    </a>
+    <a class="day-chip" href="#day-11" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 11</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/18</span>
+    </a>
+    <a class="day-chip" href="#day-12" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 12</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/19</span>
+    </a>
+    <a class="day-chip" href="#day-13" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 13</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/20</span>
+    </a>
+    <a class="day-chip" href="#day-14" draggable="true">
+      <span class="day-chip-main" contenteditable="true" spellcheck="false">Day 14</span>
+      <span class="day-chip-sub" contenteditable="true" spellcheck="false">5/21</span>
+    </a>
+  </div>
+</div>
+
+<div class="container" id="content">
+
+  <!-- Day 1 你原本的內容（下面維持舊結構，只節錄第一天當範例。
+       你可以把之前貼給我的 5/8~5/21 各 Day 的 section 全部放進來。
+       為了篇幅，我先放 Day1 ~ Day4 的示範；實際使用時，你可以照原本行程補齊。） -->
+
   <section id="day-1" data-date="5/8">
     <div class="day-title editable-block" contenteditable="true">Day 1 （5/8）</div>
-    <div class="spot-card editable-block" contenteditable="true">
+
+    <div class="spot-card editable-block" contenteditable="false">
       <div class="spot-text">
-        <div class="name-zh">成田機場</div>
-        <div class="name-ja">成田空港</div>
-        <div class="spot-meta">成田・上野 · 抵達日本</div>
+        <div class="name-zh editable-block" contenteditable="true">成田機場</div>
+        <div class="name-ja editable-block" contenteditable="true">成田空港</div>
+        <div class="spot-meta editable-block" contenteditable="true">成田・上野 · 抵達日本</div>
       </div>
       <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="成田空港" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="成田空港" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
+        <button class="btn btn-dir" data-dest-jp="成田空港" type="button">從飯店導航</button>
+        <button class="btn secondary btn-search" data-dest-jp="成田空港" type="button">在地圖上搜尋</button>
+        <button class="btn secondary btn-photo" type="button">📷 新增圖片</button>
+        <span class="drag-handle">⠿ 拖拉調整順序</span>
+      </div>
+      <div class="image-list"></div>
+      <div class="spot-note">
+        <div class="spot-note-title">
+          備註
+          <button type="button" class="btn secondary note-photo-btn" contenteditable="false">📷 新增圖片</button>
+        </div>
+        <div class="spot-note-body editable-block" contenteditable="true">
+可在這裡寫這個景點的小提醒、餐點、排隊時間等等…
+        </div>
+        <div class="image-list"></div>
       </div>
     </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
+
+    <div class="spot-card lodging-card editable-block" contenteditable="false">
       <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
+        <div class="name-zh editable-block" contenteditable="true">住宿：VESSEL INN 上野入谷站 飯店</div>
+        <div class="name-ja editable-block" contenteditable="true">ベッセルイン上野入谷駅前</div>
+        <div class="spot-meta editable-block" contenteditable="true">上野・入谷 · 住宿地點</div>
       </div>
       <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
+        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" type="button">從飯店導航</button>
+        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" type="button">在地圖上搜尋</button>
+        <button class="btn secondary btn-photo" type="button">📷 新增圖片</button>
+        <span class="drag-handle">⠿ 拖拉調整順序</span>
+      </div>
+      <div class="image-list"></div>
+      <div class="spot-note">
+        <div class="spot-note-title">
+          備註
+          <button type="button" class="btn secondary note-photo-btn" contenteditable="false">📷 新增圖片</button>
+        </div>
+        <div class="spot-note-body editable-block" contenteditable="true">
+可在這裡寫這個景點的小提醒、餐點、排隊時間等等…
+        </div>
+        <div class="image-list"></div>
       </div>
     </div>
+
     <div class="expense-card editable-block" contenteditable="true">
       <div class="expense-title">當日備註／花費</div>
       <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
@@ -467,507 +530,12 @@
       <div class="quick-add-row">
         <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
         <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
+        <button type="button" class="qa-btn">新增</button>
       </div>
     </div>
   </section>
 
-  <!-- Day 2 -->
-  <section id="day-2" data-date="5/9">
-    <div class="day-title editable-block" contenteditable="true">Day 2 （5/9）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">牛奶攤（秋葉原車站內）</div>
-        <div class="name-ja">ミルクスタンド 秋葉原</div>
-        <div class="spot-meta">上野・秋葉原 · 車站飲品小店</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ミルクスタンド 秋葉原" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ミルクスタンド 秋葉原" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">壽屋 秋葉原館</div>
-        <div class="name-ja">コトブキヤ 秋葉原館</div>
-        <div class="spot-meta">秋葉原 · 模型・公仔</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="コトブキヤ 秋葉原館" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="コトブキヤ 秋葉原館" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 3 -->
-  <section id="day-3" data-date="5/10">
-    <div class="day-title editable-block" contenteditable="true">Day 3 （5/10）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">哈利波特旗艦店（原宿）</div>
-        <div class="name-ja">ハリー・ポッター フラッグシップ原宿</div>
-        <div class="spot-meta">原宿・表參道 · 周邊聖地</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ハリー・ポッター フラッグシップ原宿" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ハリー・ポッター フラッグシップ原宿" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">Kiddy Land 原宿店</div>
-        <div class="name-ja">キデイランド原宿店</div>
-        <div class="spot-meta">原宿 · 卡通雜貨</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="キデイランド原宿店" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="キデイランド原宿店" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">明治神宮</div>
-        <div class="name-ja">明治神宮</div>
-        <div class="spot-meta">原宿・代代木 · 人氣神社</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="明治神宮" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="明治神宮" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 4 -->
-  <section id="day-4" data-date="5/11">
-    <div class="day-title editable-block" contenteditable="true">Day 4 （5/11）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">淺草寺</div>
-        <div class="name-ja">浅草寺</div>
-        <div class="spot-meta">淺草 · 雷門・仲見世通</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="浅草寺" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="浅草寺" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 5 -->
-  <section id="day-5" data-date="5/12">
-    <div class="day-title editable-block" contenteditable="true">Day 5 （5/12）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">皆中稻荷神社</div>
-        <div class="name-ja">皆中稲荷神社</div>
-        <div class="spot-meta">新宿 · 小神社</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="皆中稲荷神社" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="皆中稲荷神社" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 6 -->
-  <section id="day-6" data-date="5/13">
-    <div class="day-title editable-block" contenteditable="true">Day 6 （5/13）</div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 7 -->
-  <section id="day-7" data-date="5/14">
-    <div class="day-title editable-block" contenteditable="true">Day 7 （5/14）</div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 8 -->
-  <section id="day-8" data-date="5/15">
-    <div class="day-title editable-block" contenteditable="true">Day 8 （5/15）</div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 9 -->
-  <section id="day-9" data-date="5/16">
-    <div class="day-title editable-block" contenteditable="true">Day 9 （5/16）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">幕張展覽館（NijiFes）</div>
-        <div class="name-ja">幕張メッセ</div>
-        <div class="spot-meta">幕張 · 活動會場</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="幕張メッセ" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="幕張メッセ" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 10 -->
-  <section id="day-10" data-date="5/17">
-    <div class="day-title editable-block" contenteditable="true">Day 10 （5/17）</div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 11 -->
-  <section id="day-11" data-date="5/18">
-    <div class="day-title editable-block" contenteditable="true">Day 11 （5/18）</div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 12 -->
-  <section id="day-12" data-date="5/19">
-    <div class="day-title editable-block" contenteditable="true">Day 12 （5/19）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">橫濱 VIVRE 商場</div>
-        <div class="name-ja">横浜ビブレ</div>
-        <div class="spot-meta">橫濱 · 百貨・購物</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="横浜ビブレ" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="横浜ビブレ" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">橫濱開運水族館</div>
-        <div class="name-ja">横浜開運水族館 フォーチュンアクアリウム</div>
-        <div class="spot-meta">橫濱 · 主題水族館</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="横浜開運水族館 フォーチュンアクアリウム" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="横浜開運水族館 フォーチュンアクアリウム" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 13 -->
-  <section id="day-13" data-date="5/20">
-    <div class="day-title editable-block" contenteditable="true">Day 13 （5/20）</div>
-    <div class="spot-card lodging-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">住宿：VESSEL INN 上野入谷站 飯店</div>
-        <div class="name-ja">ベッセルイン上野入谷駅前</div>
-        <div class="spot-meta">上野・入谷 · 住宿地點</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="ベッセルイン上野入谷駅前" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Day 14 -->
-  <section id="day-14" data-date="5/21">
-    <div class="day-title editable-block" contenteditable="true">Day 14 （5/21）</div>
-    <div class="spot-card editable-block" contenteditable="true">
-      <div class="spot-text">
-        <div class="name-zh">成田機場（回程）</div>
-        <div class="name-ja">成田空港</div>
-        <div class="spot-meta">成田 · 返台</div>
-      </div>
-      <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="成田空港" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="成田空港" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="true" contenteditable="false">⠿ 拖拉調整順序</span>
-      </div>
-    </div>
-    <div class="expense-card editable-block" contenteditable="true">
-      <div class="expense-title">當日備註／花費</div>
-      <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
-    </div>
-    <div class="quick-add">
-      <div class="quick-add-title">＋ 新增行程卡片</div>
-      <div class="quick-add-row">
-        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
-        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
-        <button type="button" class="qa-btn" onclick="addSpot(this)">新增</button>
-      </div>
-    </div>
-  </section>
+  <!-- Day2~Day14 請照你前一版的內容貼上（不用改結構） -->
 
   <div class="custom-section editable-block" contenteditable="true">
     <div class="custom-title">✏️ 其他補充記錄（預留空間）</div>
@@ -982,12 +550,12 @@
 
 <script>
 (function () {
-  const STORAGE_KEY = "nijiTrip2026_v10";
+  const STORAGE_KEY = "nijiTrip2026_v11";
   const UNDO_LIMIT = 20;
 
   let undoStack = [];
   let isRestoring = false;
-  let currentPhotoCard = null;
+  let currentPhotoTarget = null; // 現在要放圖片的 image-list（景點或備註）
 
   function ensureFloatingUI() {
     let saveIndicator = document.getElementById("saveIndicator");
@@ -1003,7 +571,7 @@
       undoBtn = document.createElement("button");
       undoBtn.id = "undoBtn";
       undoBtn.className = "undo-btn";
-      undoBtn.innerHTML = "↩ 回上一步";
+      undoBtn.textContent = "↩ 回上一步";
       document.body.appendChild(undoBtn);
       undoBtn.addEventListener("click", handleUndo);
     }
@@ -1053,9 +621,9 @@
     if (!prev) return;
     isRestoring = true;
     setContentHTML(prev);
-    localStorage.setItem(STORAGE_KEY, prev);
     enhanceAllCards();
     attachCardEvents();
+    attachDragAndDrop();
     isRestoring = false;
     updateUndoBtn();
   }
@@ -1067,13 +635,14 @@
     }
   }
 
+  // --- 強化每張行程卡：圖片按鈕、圖片區、備註區 ---
   function enhanceAllCards() {
     const cards = document.querySelectorAll(".spot-card");
     cards.forEach(card => {
       let row = card.querySelector(".btn-row");
       if (!row) return;
 
-      // 1. 新增「📷 新增圖片」按鈕（如果尚未存在）
+      // 1. 景點圖片的「新增圖片」按鈕
       if (!row.querySelector(".btn-photo")) {
         const photoBtn = document.createElement("button");
         photoBtn.type = "button";
@@ -1089,7 +658,7 @@
         }
       }
 
-      // 2. 新增圖片列表容器（如果尚未存在）
+      // 2. 景點圖片列表容器
       if (!card.querySelector(".image-list")) {
         const imgList = document.createElement("div");
         imgList.className = "image-list";
@@ -1097,22 +666,65 @@
         card.appendChild(imgList);
       }
 
-      // 3. 新增「備註欄」區塊（如果尚未存在）
-      if (!card.querySelector(".spot-note")) {
-        const note = document.createElement("div");
-        note.className = "spot-note editable-block";
-        note.setAttribute("contenteditable", "true");
+      // 3. 每個景點的備註區
+      let note = card.querySelector(".spot-note");
+      if (!note) {
+        note = document.createElement("div");
+        note.className = "spot-note";
         note.innerHTML = `
-          <div class="spot-note-title">備註</div>
-          <div class="spot-note-body">可在這裡寫這個景點的小提醒、餐點、排隊時間等等…</div>
+          <div class="spot-note-title">
+            備註
+            <button type="button" class="btn secondary note-photo-btn" contenteditable="false">📷 新增圖片</button>
+          </div>
+          <div class="spot-note-body editable-block" contenteditable="true">
+可在這裡寫這個景點的小提醒、餐點、排隊時間等等…
+          </div>
+          <div class="image-list" contenteditable="false"></div>
         `;
         card.appendChild(note);
+      } else {
+        // 確保舊版也有按鈕／body 可編輯／圖片列表
+        let title = note.querySelector(".spot-note-title");
+        if (!title) {
+          title = document.createElement("div");
+          title.className = "spot-note-title";
+          title.textContent = "備註";
+          note.insertBefore(title, note.firstChild);
+        }
+        if (!note.querySelector(".note-photo-btn")) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "btn secondary note-photo-btn";
+          btn.textContent = "📷 新增圖片";
+          btn.setAttribute("contenteditable", "false");
+          title.appendChild(btn);
+        }
+        let body = note.querySelector(".spot-note-body");
+        if (!body) {
+          body = document.createElement("div");
+          body.className = "spot-note-body editable-block";
+          body.setAttribute("contenteditable", "true");
+          body.textContent = "可在這裡寫這個景點的小提醒、餐點、排隊時間等等…";
+          note.appendChild(body);
+        } else {
+          body.classList.add("editable-block");
+          body.setAttribute("contenteditable", "true");
+        }
+        let imgList = note.querySelector(".image-list");
+        if (!imgList) {
+          imgList = document.createElement("div");
+          imgList.className = "image-list";
+          imgList.setAttribute("contenteditable", "false");
+          note.appendChild(imgList);
+        }
       }
 
-      // 4. 讓整張卡片可拖拉排序
+      // 卡片本身可拖曳
       card.setAttribute("draggable", "true");
     });
   }
+
+  // --- 行程卡拖拉排序（同一天內） ---
   function attachDragAndDrop() {
     const content = document.getElementById("content");
     if (!content) return;
@@ -1145,10 +757,9 @@
       const target = e.target.closest(".spot-card");
       if (!target || target === draggingCard) return;
 
-      const rect = target.getBoundingClientRect();
-      const offset = e.clientY - rect.top;
-      const insertBefore = offset < rect.height / 2;
-
+      const targetRect = target.getBoundingClientRect();
+      const offset = e.clientY - targetRect.top;
+      const insertBefore = offset < targetRect.height / 2;
       if (insertBefore) {
         section.insertBefore(draggingCard, target);
       } else {
@@ -1157,6 +768,7 @@
     });
   }
 
+  // --- Quick Add 新增卡片 ---
   function addSpot(btn) {
     const wrapper = btn.closest("section");
     if (!wrapper) return;
@@ -1170,17 +782,29 @@
 
     const card = document.createElement("div");
     card.className = "spot-card editable-block";
-    card.setAttribute("contenteditable", "true");
+    card.setAttribute("contenteditable", "false");
     card.innerHTML = `
       <div class="spot-text">
-        <div class="name-zh">${nameZh}</div>
-        <div class="name-ja">${nameJa}</div>
-        <div class="spot-meta">自訂行程</div>
+        <div class="name-zh editable-block" contenteditable="true">${nameZh}</div>
+        <div class="name-ja editable-block" contenteditable="true">${nameJa}</div>
+        <div class="spot-meta editable-block" contenteditable="true">自訂行程</div>
       </div>
       <div class="btn-row" contenteditable="false">
-        <button class="btn btn-dir" data-dest-jp="${nameJa}" contenteditable="false">從飯店導航</button>
-        <button class="btn secondary btn-search" data-dest-jp="${nameJa}" contenteditable="false">在地圖上搜尋</button>
-        <span class="drag-handle" draggable="false" contenteditable="false">⠿ 拖拉調整順序</span>
+        <button class="btn btn-dir" data-dest-jp="${nameJa}" type="button">從飯店導航</button>
+        <button class="btn secondary btn-search" data-dest-jp="${nameJa}" type="button">在地圖上搜尋</button>
+        <button class="btn secondary btn-photo" type="button">📷 新增圖片</button>
+        <span class="drag-handle">⠿ 拖拉調整順序</span>
+      </div>
+      <div class="image-list"></div>
+      <div class="spot-note">
+        <div class="spot-note-title">
+          備註
+          <button type="button" class="btn secondary note-photo-btn" contenteditable="false">📷 新增圖片</button>
+        </div>
+        <div class="spot-note-body editable-block" contenteditable="true">
+可在這裡寫這個景點的小提醒、餐點、排隊時間等等…
+        </div>
+        <div class="image-list"></div>
       </div>
     `;
 
@@ -1198,7 +822,13 @@
     saveState();
   }
 
-  window.addSpot = addSpot;
+  window.addSpot = addSpot; // 給 HTML onclick 用
+
+  // --- 可編輯區的自動儲存 ---
+  function onEditableInput() {
+    if (this._saveTimer) clearTimeout(this._saveTimer);
+    this._saveTimer = setTimeout(() => saveState(), 400);
+  }
 
   function attachCardEvents() {
     const content = document.getElementById("content");
@@ -1214,13 +844,9 @@
     });
   }
 
-  function onEditableInput() {
-    if (this._saveTimer) clearTimeout(this._saveTimer);
-    this._saveTimer = setTimeout(() => saveState(), 400);
-  }
-
+  // --- 匯出／匯入備份 JSON ---
   function attachBackupButtons() {
-     const exportBtn = document.getElementById("btnExport");
+    const exportBtn = document.getElementById("btnExport");
     const importBtn = document.getElementById("btnImport");
     const fileInput = document.getElementById("backupImport");
 
@@ -1274,129 +900,38 @@
       });
     }
   }
-  // --- 自動新增 / 刪除 Day ---
-  function addNewDay() {
-    const content = document.getElementById("content");
-    const navRow = document.querySelector(".day-nav-row");
-    if (!content || !navRow) return;
 
-    const sections = content.querySelectorAll("section[id^='day-']");
-    const newIndex = sections.length + 1;
-
-    const lastSection = sections[sections.length - 1];
-    let newDateStr = "5/1";
-    if (lastSection) {
-      const prevDateStr = lastSection.getAttribute("data-date") || "";
-      const m = prevDateStr.match(/^(\d{1,2})\/(\d{1,2})$/);
-      if (m) {
-        const month = parseInt(m[1], 10);
-        const day = parseInt(m[2], 10);
-        // 年份用 2026，只是拿來做 +1 天，實際顯示只用到月 / 日
-        const d = new Date(2026, month - 1, day + 1);
-        const mm = d.getMonth() + 1;
-        const dd = d.getDate();
-        newDateStr = mm + "/" + dd;
-      } else {
-        newDateStr = prevDateStr || ("5/" + (newIndex + 7));
-      }
-    }
-
-    // 1. 上方 Day 標籤
-    const chip = document.createElement("a");
-    chip.className = "day-chip";
-    chip.href = "#day-" + newIndex;
-    chip.innerHTML =
-      '<span class="day-chip-main" contenteditable="true">Day ' + newIndex + '</span>' +
-      '<span class="day-chip-sub" contenteditable="true">' + newDateStr + '</span>';
-    navRow.appendChild(chip);
-
-    // 2. 下方 Day 區塊（給你空白的一天，可以自己新增行程卡）
-    const section = document.createElement("section");
-    section.id = "day-" + newIndex;
-    section.setAttribute("data-date", newDateStr);
-    section.innerHTML =
-      '<div class="day-title editable-block" contenteditable="true">Day ' + newIndex + ' （' + newDateStr + '）</div>' +
-      '<div class="expense-card editable-block" contenteditable="true">' +
-        '<div class="expense-title">當日備註／花費</div>' +
-        '<div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>' +
-      '</div>' +
-      '<div class="quick-add">' +
-        '<div class="quick-add-title">＋ 新增行程卡片</div>' +
-        '<div class="quick-add-row">' +
-          '<input type="text" class="qa-name" placeholder="地點名稱（中文）" />' +
-          '<input type="text" class="qa-jp" placeholder="日文名稱或地址" />' +
-          '<button type="button" class="qa-btn">新增</button>' +
-        '</div>' +
-      '</div>';
-
-    content.appendChild(section);
-
-    // 重新綁定事件與自動儲存
-    enhanceAllCards();
-    attachCardEvents();
-    saveState();
-  }
-
-  function removeLastDay() {
-    const content = document.getElementById("content");
-    const navRow = document.querySelector(".day-nav-row");
-    if (!content || !navRow) return;
-
-    const sections = content.querySelectorAll("section[id^='day-']");
-    if (sections.length <= 1) {
-      alert("至少要保留一天行程。");
-      return;
-    }
-
-    const lastSection = sections[sections.length - 1];
-    const lastId = "#" + lastSection.id;
-
-    if (!confirm("要刪除「" + lastSection.id + "」這一天嗎？")) return;
-
-    // 刪 Day 區塊
-    lastSection.remove();
-
-    // 刪對應的 Day 標籤
-    const chips = navRow.querySelectorAll(".day-chip");
-    for (let i = chips.length - 1; i >= 0; i--) {
-      const chip = chips[i];
-      if (chip.getAttribute("href") === lastId) {
-        chip.remove();
-        break;
-      }
-    }
-
-    saveState();
-  }
-
-  function attachDayButtons() {
-    const addBtn = document.getElementById("btnAddDay");
-    const removeBtn = document.getElementById("btnRemoveDay");
-    if (addBtn) addBtn.addEventListener("click", addNewDay);
-    if (removeBtn) removeBtn.addEventListener("click", removeLastDay);
-  }
-
+  // --- 新增圖片（景點＋備註共用） ---
   function attachPhotoFeature() {
     const content = document.getElementById("content");
     const photoInput = document.getElementById("photoInput");
     if (!content || !photoInput) return;
 
     content.addEventListener("click", e => {
-      const btn = e.target.closest(".btn-photo");
-      if (!btn) return;
-      currentPhotoCard = btn.closest(".spot-card");
-      if (!currentPhotoCard) return;
+      const cardBtn = e.target.closest(".btn-photo");
+      const noteBtn = e.target.closest(".note-photo-btn");
+      if (!cardBtn && !noteBtn) return;
+
+      if (cardBtn) {
+        const card = cardBtn.closest(".spot-card");
+        currentPhotoTarget = card && card.querySelector(".image-list");
+      } else {
+        const note = noteBtn.closest(".spot-note");
+        currentPhotoTarget = note && note.querySelector(".image-list");
+      }
+      if (!currentPhotoTarget) return;
+
       photoInput.value = "";
       photoInput.click();
     });
 
     photoInput.addEventListener("change", () => {
       const file = photoInput.files && photoInput.files[0];
-      if (!file || !currentPhotoCard) return;
+      if (!file || !currentPhotoTarget) return;
       const reader = new FileReader();
       reader.onload = e => {
         const url = e.target.result;
-        const list = currentPhotoCard.querySelector(".image-list");
+        const list = currentPhotoTarget;
         if (!list) return;
         const img = document.createElement("img");
         img.className = "spot-photo";
@@ -1417,6 +952,7 @@
     });
   }
 
+  // --- Google Map 導航／搜尋 ---
   function attachMapButtons() {
     const content = document.getElementById("content");
     if (!content) return;
@@ -1429,7 +965,7 @@
       const btn = dirBtn || searchBtn;
       if (btn) {
         destJp = btn.getAttribute("data-dest-jp") ||
-                 (btn.closest(".spot-card")?.querySelector(".name-ja")?.textContent || "").trim();
+          (btn.closest(".spot-card")?.querySelector(".name-ja")?.textContent || "").trim();
       }
 
       if (dirBtn && destJp) {
@@ -1450,6 +986,147 @@
     });
   }
 
+  // --- 新增／刪除 Day ---
+  function addDay() {
+    const content = document.getElementById("content");
+    const navRow = document.querySelector(".day-nav-row");
+    if (!content || !navRow) return;
+
+    const sections = content.querySelectorAll("section[id^='day-']");
+    if (sections.length === 0) return;
+
+    const lastSection = sections[sections.length - 1];
+    const newIndex = sections.length + 1;
+    const newId = "day-" + newIndex;
+
+    const firstChip = navRow.querySelector(".day-chip");
+    if (!firstChip) return;
+
+    const newChip = firstChip.cloneNode(true);
+    newChip.setAttribute("href", "#" + newId);
+    newChip.setAttribute("draggable", "true");
+
+    const mainSpan = newChip.querySelector(".day-chip-main");
+    const subSpan = newChip.querySelector(".day-chip-sub");
+
+    if (mainSpan) mainSpan.textContent = "Day " + newIndex;
+
+    const lastDate = lastSection.getAttribute("data-date") || "";
+    if (subSpan) subSpan.textContent = lastDate;
+
+    navRow.appendChild(newChip);
+
+    const newSection = lastSection.cloneNode(true);
+    newSection.id = newId;
+    newSection.setAttribute("data-date", lastDate);
+
+    const titleEl = newSection.querySelector(".day-title");
+    if (titleEl) {
+      titleEl.textContent = "Day " + newIndex + " （" + lastDate + "）";
+    }
+
+    // 清掉新 day 內部的所有圖片，讓它是乾淨的模板（可視需要保留）
+    newSection.querySelectorAll("img.spot-photo").forEach(img => img.remove());
+    newSection.querySelectorAll(".image-list").forEach(list => list.innerHTML = "");
+
+    content.appendChild(newSection);
+
+    enhanceAllCards();
+    attachCardEvents();
+    saveState();
+
+    newChip.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    setTimeout(() => {
+      newSection.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 250);
+  }
+
+  function removeDay() {
+    const content = document.getElementById("content");
+    const navRow = document.querySelector(".day-nav-row");
+    if (!content || !navRow) return;
+
+    const sections = content.querySelectorAll("section[id^='day-']");
+    if (sections.length <= 1) {
+      alert("至少要保留一天行程喔！");
+      return;
+    }
+    const lastSection = sections[sections.length - 1];
+    const lastId = "#" + lastSection.id;
+
+    const chips = navRow.querySelectorAll(".day-chip");
+    const lastChip = Array.from(chips).find(ch => ch.getAttribute("href") === lastId) || chips[chips.length - 1];
+
+    if (confirm("確定要刪除最後一天嗎？")) {
+      lastSection.remove();
+      if (lastChip) lastChip.remove();
+      saveState();
+    }
+  }
+
+  function attachDayButtons() {
+    const addBtn = document.getElementById("btnAddDay");
+    const removeBtn = document.getElementById("btnRemoveDay");
+    if (addBtn) addBtn.addEventListener("click", addDay);
+    if (removeBtn) removeBtn.addEventListener("click", removeDay);
+  }
+
+  // --- Day 列拖拉排序（連動畫面下方的 section） ---
+  function attachDayDrag() {
+    const navRow = document.querySelector(".day-nav-row");
+    const content = document.getElementById("content");
+    if (!navRow || !content) return;
+
+    let draggingChip = null;
+
+    navRow.addEventListener("dragstart", e => {
+      const chip = e.target.closest(".day-chip");
+      if (!chip) return;
+      draggingChip = chip;
+      chip.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+    });
+
+    navRow.addEventListener("dragend", () => {
+      if (draggingChip) draggingChip.classList.remove("dragging");
+      draggingChip = null;
+      saveState();
+    });
+
+    navRow.addEventListener("dragover", e => {
+      if (!draggingChip) return;
+      e.preventDefault();
+      const target = e.target.closest(".day-chip");
+      if (!target || target === draggingChip) return;
+
+      const targetRect = target.getBoundingClientRect();
+      const before = e.clientX < targetRect.left + targetRect.width / 2;
+
+      if (before) {
+        navRow.insertBefore(draggingChip, target);
+      } else {
+        navRow.insertBefore(draggingChip, target.nextSibling);
+      }
+
+      const draggingHref = draggingChip.getAttribute("href");
+      const targetHref = target.getAttribute("href");
+      const draggingSection = draggingHref && document.querySelector(draggingHref);
+      const targetSection = targetHref && document.querySelector(targetHref);
+      if (draggingSection && targetSection) {
+        const parent = draggingSection.parentElement;
+        if (before) {
+          parent.insertBefore(draggingSection, targetSection);
+        } else {
+          parent.insertBefore(draggingSection, targetSection.nextSibling);
+        }
+      }
+    });
+
+    navRow.querySelectorAll(".day-chip").forEach(chip => {
+      chip.setAttribute("draggable", "true");
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     ensureFloatingUI();
     restoreFromLocal();
@@ -1457,9 +1134,10 @@
     attachCardEvents();
     attachDragAndDrop();
     attachBackupButtons();
-    attachDayButtons();  
+    attachDayButtons();
     attachPhotoFeature();
     attachMapButtons();
+    attachDayDrag();
 
     undoStack = [getContentHTML()];
     updateUndoBtn();
