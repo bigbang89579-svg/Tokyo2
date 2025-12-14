@@ -353,16 +353,21 @@
 </head>
 <body>
 <header>
-  <h1>Niji Trip 2026 🌈</h1>
-  <p>東京行程 · 暖色主題 · 拖拉排序＋住宿欄位＋每日花費＋回上一步</p>
-  <div class="hint">✏️ 行程卡可以直接改文字、拖拉排序；改錯可以用右下角「回上一步」。</div>
+  <h1 class="editable-block" contenteditable="true">Niji Trip 2026 🌈</h1>
+  <p class="editable-block" contenteditable="true">
+    東京行程 · 暖色主題 · 拖拉排序＋住宿欄位＋每日花費＋回上一步
+  </p>
+  <div class="hint editable-block" contenteditable="true">
+    ✏️ 行程卡可以直接改文字、拖拉排序；改錯可以用右下角「回上一步」。
+  </div>
 
   <div class="toolbar">
     <button type="button" id="btnExport">匯出備份（JSON）</button>
     <button type="button" id="btnImport">匯入備份</button>
+    <button type="button" id="btnAddDay">＋ 新增一天</button>
+    <button type="button" id="btnRemoveDay">－ 刪除最後一天</button>
   </div>
 </header>
-
 <!-- 匯入備份用的隱藏 input -->
 <input type="file" id="backupImport" accept="application/json" style="display:none">
 
@@ -1215,7 +1220,7 @@
   }
 
   function attachBackupButtons() {
-    const exportBtn = document.getElementById("btnExport");
+     const exportBtn = document.getElementById("btnExport");
     const importBtn = document.getElementById("btnImport");
     const fileInput = document.getElementById("backupImport");
 
@@ -1268,6 +1273,107 @@
         reader.readAsText(file);
       });
     }
+  }
+  // --- 自動新增 / 刪除 Day ---
+  function addNewDay() {
+    const content = document.getElementById("content");
+    const navRow = document.querySelector(".day-nav-row");
+    if (!content || !navRow) return;
+
+    const sections = content.querySelectorAll("section[id^='day-']");
+    const newIndex = sections.length + 1;
+
+    const lastSection = sections[sections.length - 1];
+    let newDateStr = "5/1";
+    if (lastSection) {
+      const prevDateStr = lastSection.getAttribute("data-date") || "";
+      const m = prevDateStr.match(/^(\d{1,2})\/(\d{1,2})$/);
+      if (m) {
+        const month = parseInt(m[1], 10);
+        const day = parseInt(m[2], 10);
+        // 年份用 2026，只是拿來做 +1 天，實際顯示只用到月 / 日
+        const d = new Date(2026, month - 1, day + 1);
+        const mm = d.getMonth() + 1;
+        const dd = d.getDate();
+        newDateStr = mm + "/" + dd;
+      } else {
+        newDateStr = prevDateStr || ("5/" + (newIndex + 7));
+      }
+    }
+
+    // 1. 上方 Day 標籤
+    const chip = document.createElement("a");
+    chip.className = "day-chip";
+    chip.href = "#day-" + newIndex;
+    chip.innerHTML =
+      '<span class="day-chip-main" contenteditable="true">Day ' + newIndex + '</span>' +
+      '<span class="day-chip-sub" contenteditable="true">' + newDateStr + '</span>';
+    navRow.appendChild(chip);
+
+    // 2. 下方 Day 區塊（給你空白的一天，可以自己新增行程卡）
+    const section = document.createElement("section");
+    section.id = "day-" + newIndex;
+    section.setAttribute("data-date", newDateStr);
+    section.innerHTML =
+      '<div class="day-title editable-block" contenteditable="true">Day ' + newIndex + ' （' + newDateStr + '）</div>' +
+      '<div class="expense-card editable-block" contenteditable="true">' +
+        '<div class="expense-title">當日備註／花費</div>' +
+        '<div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>' +
+      '</div>' +
+      '<div class="quick-add">' +
+        '<div class="quick-add-title">＋ 新增行程卡片</div>' +
+        '<div class="quick-add-row">' +
+          '<input type="text" class="qa-name" placeholder="地點名稱（中文）" />' +
+          '<input type="text" class="qa-jp" placeholder="日文名稱或地址" />' +
+          '<button type="button" class="qa-btn">新增</button>' +
+        '</div>' +
+      '</div>';
+
+    content.appendChild(section);
+
+    // 重新綁定事件與自動儲存
+    enhanceAllCards();
+    attachCardEvents();
+    saveState();
+  }
+
+  function removeLastDay() {
+    const content = document.getElementById("content");
+    const navRow = document.querySelector(".day-nav-row");
+    if (!content || !navRow) return;
+
+    const sections = content.querySelectorAll("section[id^='day-']");
+    if (sections.length <= 1) {
+      alert("至少要保留一天行程。");
+      return;
+    }
+
+    const lastSection = sections[sections.length - 1];
+    const lastId = "#" + lastSection.id;
+
+    if (!confirm("要刪除「" + lastSection.id + "」這一天嗎？")) return;
+
+    // 刪 Day 區塊
+    lastSection.remove();
+
+    // 刪對應的 Day 標籤
+    const chips = navRow.querySelectorAll(".day-chip");
+    for (let i = chips.length - 1; i >= 0; i--) {
+      const chip = chips[i];
+      if (chip.getAttribute("href") === lastId) {
+        chip.remove();
+        break;
+      }
+    }
+
+    saveState();
+  }
+
+  function attachDayButtons() {
+    const addBtn = document.getElementById("btnAddDay");
+    const removeBtn = document.getElementById("btnRemoveDay");
+    if (addBtn) addBtn.addEventListener("click", addNewDay);
+    if (removeBtn) removeBtn.addEventListener("click", removeLastDay);
   }
 
   function attachPhotoFeature() {
@@ -1351,6 +1457,7 @@
     attachCardEvents();
     attachDragAndDrop();
     attachBackupButtons();
+    attachDayButtons();  
     attachPhotoFeature();
     attachMapButtons();
 
