@@ -16,9 +16,7 @@
       --brown-soft: #7a5446;
       --border-soft: #ead8c0;
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: "Noto Sans TC", system-ui, sans-serif;
       margin: 0;
@@ -54,7 +52,6 @@
       font-size: 11px;
       opacity: 0.85;
     }
-
     .toolbar {
       margin-top: 6px;
       display: flex;
@@ -117,9 +114,7 @@
       font-size: 10px;
       opacity: 0.9;
     }
-    .day-chip[contenteditable="true"] {
-      cursor: text;
-    }
+    .day-chip[contenteditable="true"] { cursor: text; }
     .day-chip.dragging {
       opacity: 0.8;
       box-shadow: 0 4px 10px rgba(150, 110, 80, 0.65);
@@ -330,7 +325,6 @@
       cursor: default;
     }
 
-    /* 圖片列表 */
     .image-list {
       margin-top: 6px;
       display: flex;
@@ -348,7 +342,6 @@
     }
     .spot-photo:hover { opacity: 0.85; }
 
-    /* 每個景點上的專屬備註欄位 */
     .spot-note {
       margin-top: 6px;
       padding: 6px 8px;
@@ -395,10 +388,7 @@
   </div>
 </header>
 
-<!-- 匯入備份用的隱藏 input -->
 <input type="file" id="backupImport" accept="application/json" style="display:none" />
-
-<!-- 新增圖片用的隱藏 input（景點＋備註共用） -->
 <input type="file" id="photoInput" accept="image/*" style="display:none" />
 
 <div class="day-nav">
@@ -464,10 +454,7 @@
 
 <div class="container" id="content">
 
-  <!-- Day 1 你原本的內容（下面維持舊結構，只節錄第一天當範例。
-       你可以把之前貼給我的 5/8~5/21 各 Day 的 section 全部放進來。
-       為了篇幅，我先放 Day1 ~ Day4 的示範；實際使用時，你可以照原本行程補齊。） -->
-
+  <!-- Day 1：示範有兩張景點卡＋備註＋快速新增 -->
   <section id="day-1" data-date="5/8">
     <div class="day-title editable-block" contenteditable="true">Day 1 （5/8）</div>
 
@@ -525,6 +512,7 @@
       <div class="expense-title">當日備註／花費</div>
       <div>例：餐飲 xxx 元、交通 xxx 元、購物 xxx 元、其他心得……</div>
     </div>
+
     <div class="quick-add">
       <div class="quick-add-title">＋ 新增行程卡片</div>
       <div class="quick-add-row">
@@ -535,7 +523,221 @@
     </div>
   </section>
 
-  <!-- Day2~Day14 請照你前一版的內容貼上（不用改結構） -->
+  <!-- Day 2 ~ Day 14：先放空白模板，讓你在頁面上補卡片或貼回舊檔內容 -->
+
+  <section id="day-2" data-date="5/9">
+    <div class="day-title editable-block" contenteditable="true">Day 2 （5/9）</div>
+
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-3" data-date="5/10">
+    <div class="day-title editable-block" contenteditable="true">Day 3 （5/10）</div>
+
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-4" data-date="5/11">
+    <div class="day-title editable-block" contenteditable="true">Day 4 （5/11）</div>
+
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-5" data-date="5/12">
+    <div class="day-title editable-block" contenteditable="true">Day 5 （5/12）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-6" data-date="5/13">
+    <div class="day-title editable-block" contenteditable="true">Day 6 （5/13）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-7" data-date="5/14">
+    <div class="day-title editable-block" contenteditable="true">Day 7 （5/14）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-8" data-date="5/15">
+    <div class="day-title editable-block" contenteditable="true">Day 8 （5/15）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-9" data-date="5/16">
+    <div class="day-title editable-block" contenteditable="true">Day 9 （5/16）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-10" data-date="5/17">
+    <div class="day-title editable-block" contenteditable="true">Day 10 （5/17）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-11" data-date="5/18">
+    <div class="day-title editable-block" contenteditable="true">Day 11 （5/18）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-12" data-date="5/19">
+    <div class="day-title editable-block" contenteditable="true">Day 12 （5/19）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-13" data-date="5/20">
+    <div class="day-title editable-block" contenteditable="true">Day 13 （5/20）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="day-14" data-date="5/21">
+    <div class="day-title editable-block" contenteditable="true">Day 14 （5/21）</div>
+    <div class="expense-card editable-block" contenteditable="true">
+      <div class="expense-title">當日備註／花費</div>
+      <div>今天的行程內容請在下方新增行程卡片，或貼上舊檔內容。</div>
+    </div>
+    <div class="quick-add">
+      <div class="quick-add-title">＋ 新增行程卡片</div>
+      <div class="quick-add-row">
+        <input type="text" class="qa-name" placeholder="地點名稱（中文）" />
+        <input type="text" class="qa-jp" placeholder="日文名稱或地址" />
+        <button type="button" class="qa-btn">新增</button>
+      </div>
+    </div>
+  </section>
 
   <div class="custom-section editable-block" contenteditable="true">
     <div class="custom-title">✏️ 其他補充記錄（預留空間）</div>
@@ -555,7 +757,7 @@
 
   let undoStack = [];
   let isRestoring = false;
-  let currentPhotoTarget = null; // 現在要放圖片的 image-list（景點或備註）
+  let currentPhotoTarget = null;
 
   function ensureFloatingUI() {
     let saveIndicator = document.getElementById("saveIndicator");
@@ -624,41 +826,35 @@
     enhanceAllCards();
     attachCardEvents();
     attachDragAndDrop();
+    attachPhotoFeature();
+    attachMapButtons();
+    attachDayDrag();
     isRestoring = false;
     updateUndoBtn();
   }
 
   function restoreFromLocal() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      setContentHTML(saved);
-    }
+    if (saved) setContentHTML(saved);
   }
 
-  // --- 強化每張行程卡：圖片按鈕、圖片區、備註區 ---
   function enhanceAllCards() {
     const cards = document.querySelectorAll(".spot-card");
     cards.forEach(card => {
       let row = card.querySelector(".btn-row");
       if (!row) return;
 
-      // 1. 景點圖片的「新增圖片」按鈕
       if (!row.querySelector(".btn-photo")) {
         const photoBtn = document.createElement("button");
         photoBtn.type = "button";
         photoBtn.className = "btn secondary btn-photo";
         photoBtn.textContent = "📷 新增圖片";
         photoBtn.setAttribute("contenteditable", "false");
-
         const drag = row.querySelector(".drag-handle");
-        if (drag) {
-          row.insertBefore(photoBtn, drag);
-        } else {
-          row.appendChild(photoBtn);
-        }
+        if (drag) row.insertBefore(photoBtn, drag);
+        else row.appendChild(photoBtn);
       }
 
-      // 2. 景點圖片列表容器
       if (!card.querySelector(".image-list")) {
         const imgList = document.createElement("div");
         imgList.className = "image-list";
@@ -666,7 +862,6 @@
         card.appendChild(imgList);
       }
 
-      // 3. 每個景點的備註區
       let note = card.querySelector(".spot-note");
       if (!note) {
         note = document.createElement("div");
@@ -683,7 +878,6 @@
         `;
         card.appendChild(note);
       } else {
-        // 確保舊版也有按鈕／body 可編輯／圖片列表
         let title = note.querySelector(".spot-note-title");
         if (!title) {
           title = document.createElement("div");
@@ -719,12 +913,10 @@
         }
       }
 
-      // 卡片本身可拖曳
       card.setAttribute("draggable", "true");
     });
   }
 
-  // --- 行程卡拖拉排序（同一天內） ---
   function attachDragAndDrop() {
     const content = document.getElementById("content");
     if (!content) return;
@@ -753,22 +945,15 @@
       e.preventDefault();
       const section = e.target.closest("section[id^='day-']");
       if (!section) return;
-
       const target = e.target.closest(".spot-card");
       if (!target || target === draggingCard) return;
-
-      const targetRect = target.getBoundingClientRect();
-      const offset = e.clientY - targetRect.top;
-      const insertBefore = offset < targetRect.height / 2;
-      if (insertBefore) {
-        section.insertBefore(draggingCard, target);
-      } else {
-        section.insertBefore(draggingCard, target.nextSibling);
-      }
+      const rect = target.getBoundingClientRect();
+      const before = e.clientY < rect.top + rect.height / 2;
+      if (before) section.insertBefore(draggingCard, target);
+      else section.insertBefore(draggingCard, target.nextSibling);
     });
   }
 
-  // --- Quick Add 新增卡片 ---
   function addSpot(btn) {
     const wrapper = btn.closest("section");
     if (!wrapper) return;
@@ -809,22 +994,18 @@
     `;
 
     const expense = wrapper.querySelector(".expense-card");
-    if (expense) {
-      wrapper.insertBefore(card, expense);
-    } else {
-      wrapper.appendChild(card);
-    }
+    if (expense) wrapper.insertBefore(card, expense);
+    else wrapper.appendChild(card);
 
     nameInput.value = "";
     jpInput.value = "";
+
     enhanceAllCards();
     attachCardEvents();
     saveState();
   }
+  window.addSpot = addSpot;
 
-  window.addSpot = addSpot; // 給 HTML onclick 用
-
-  // --- 可編輯區的自動儲存 ---
   function onEditableInput() {
     if (this._saveTimer) clearTimeout(this._saveTimer);
     this._saveTimer = setTimeout(() => saveState(), 400);
@@ -844,7 +1025,6 @@
     });
   }
 
-  // --- 匯出／匯入備份 JSON ---
   function attachBackupButtons() {
     const exportBtn = document.getElementById("btnExport");
     const importBtn = document.getElementById("btnImport");
@@ -886,6 +1066,10 @@
               setContentHTML(json.html);
               enhanceAllCards();
               attachCardEvents();
+              attachDragAndDrop();
+              attachPhotoFeature();
+              attachMapButtons();
+              attachDayDrag();
               localStorage.setItem(STORAGE_KEY, json.html);
               undoStack = [json.html];
               isRestoring = false;
@@ -901,7 +1085,6 @@
     }
   }
 
-  // --- 新增圖片（景點＋備註共用） ---
   function attachPhotoFeature() {
     const content = document.getElementById("content");
     const photoInput = document.getElementById("photoInput");
@@ -952,7 +1135,6 @@
     });
   }
 
-  // --- Google Map 導航／搜尋 ---
   function attachMapButtons() {
     const content = document.getElementById("content");
     if (!content) return;
@@ -986,7 +1168,6 @@
     });
   }
 
-  // --- 新增／刪除 Day ---
   function addDay() {
     const content = document.getElementById("content");
     const navRow = document.querySelector(".day-nav-row");
@@ -1025,7 +1206,6 @@
       titleEl.textContent = "Day " + newIndex + " （" + lastDate + "）";
     }
 
-    // 清掉新 day 內部的所有圖片，讓它是乾淨的模板（可視需要保留）
     newSection.querySelectorAll("img.spot-photo").forEach(img => img.remove());
     newSection.querySelectorAll(".image-list").forEach(list => list.innerHTML = "");
 
@@ -1033,6 +1213,10 @@
 
     enhanceAllCards();
     attachCardEvents();
+    attachDragAndDrop();
+    attachPhotoFeature();
+    attachMapButtons();
+    attachDayDrag();
     saveState();
 
     newChip.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
@@ -1071,7 +1255,6 @@
     if (removeBtn) removeBtn.addEventListener("click", removeDay);
   }
 
-  // --- Day 列拖拉排序（連動畫面下方的 section） ---
   function attachDayDrag() {
     const navRow = document.querySelector(".day-nav-row");
     const content = document.getElementById("content");
@@ -1099,14 +1282,11 @@
       const target = e.target.closest(".day-chip");
       if (!target || target === draggingChip) return;
 
-      const targetRect = target.getBoundingClientRect();
-      const before = e.clientX < targetRect.left + targetRect.width / 2;
+      const rect = target.getBoundingClientRect();
+      const before = e.clientX < rect.left + rect.width / 2;
 
-      if (before) {
-        navRow.insertBefore(draggingChip, target);
-      } else {
-        navRow.insertBefore(draggingChip, target.nextSibling);
-      }
+      if (before) navRow.insertBefore(draggingChip, target);
+      else navRow.insertBefore(draggingChip, target.nextSibling);
 
       const draggingHref = draggingChip.getAttribute("href");
       const targetHref = target.getAttribute("href");
@@ -1114,11 +1294,8 @@
       const targetSection = targetHref && document.querySelector(targetHref);
       if (draggingSection && targetSection) {
         const parent = draggingSection.parentElement;
-        if (before) {
-          parent.insertBefore(draggingSection, targetSection);
-        } else {
-          parent.insertBefore(draggingSection, targetSection.nextSibling);
-        }
+        if (before) parent.insertBefore(draggingSection, targetSection);
+        else parent.insertBefore(draggingSection, targetSection.nextSibling);
       }
     });
 
